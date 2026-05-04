@@ -1,389 +1,1078 @@
-
-<h2 class="sr-only">TimeScope – Smart Time Tracking and Productivity Analyzer. Track activities with one tap, view analytics, and get AI-powered weekly insights.</h2>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TimeScope</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans)}
-.ts-app{padding:1rem;max-width:680px}
-.ts-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem}
-.ts-logo{font-size:18px;font-weight:500;color:var(--color-text-primary)}
-.ts-logo span{color:#3266ad}
-.ts-nav{display:flex;gap:6px}
-.ts-nav button{font-size:12px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--color-border-secondary);background:transparent;cursor:pointer;color:var(--color-text-secondary)}
-.ts-nav button.active{background:#3266ad;border-color:#3266ad;color:#fff}
-.ts-section{display:none}
-.ts-section.active{display:block}
-.metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:1.25rem}
-.metric-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:.75rem 1rem}
-.metric-label{font-size:11px;color:var(--color-text-secondary);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
-.metric-value{font-size:22px;font-weight:500;color:var(--color-text-primary)}
-.metric-sub{font-size:11px;color:var(--color-text-secondary);margin-top:2px}
-.activity-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:1.25rem}
-.act-btn{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:1rem .75rem;cursor:pointer;background:var(--color-background-primary);transition:transform .1s;text-align:center;position:relative}
-.act-btn:hover{background:var(--color-background-secondary);transform:scale(1.02)}
-.act-btn.running{border-width:1.5px}
-.act-btn.running.study{border-color:#3266ad;background:#e6f1fb}
-.act-btn.running.work{border-color:#0F6E56;background:#e1f5ee}
-.act-btn.running.phone{border-color:#D4537E;background:#fbeaf0}
-.act-btn.running.sleep{border-color:#7F77DD;background:#eeedfe}
-.act-btn.running.travel{border-color:#BA7517;background:#faeeda}
-.act-btn.running.exercise{border-color:#639922;background:#eaf3de}
-.act-icon{font-size:24px;margin-bottom:6px}
-.act-name{font-size:13px;font-weight:500;color:var(--color-text-primary)}
-.act-cat{font-size:10px;color:var(--color-text-secondary);margin-top:2px}
-.act-timer{font-size:11px;font-weight:500;margin-top:4px;color:#3266ad}
-.act-total{font-size:10px;color:var(--color-text-secondary);margin-top:2px}
-.running-bar{position:fixed;bottom:0;left:0;right:0;background:#3266ad;color:#fff;padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;font-size:13px;z-index:100;display:none}
-.running-bar.visible{display:flex}
-.stop-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:4px 14px;border-radius:20px;cursor:pointer;font-size:12px}
-.suggestion-card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:.875rem 1rem;margin-bottom:1rem;display:flex;align-items:center;gap:10px}
-.sug-icon{font-size:16px;flex-shrink:0}
-.sug-text{font-size:13px;color:var(--color-text-primary);flex:1}
-.sug-btn{font-size:11px;padding:4px 10px;border:0.5px solid var(--color-border-secondary);border-radius:20px;background:transparent;cursor:pointer;color:var(--color-text-secondary);white-space:nowrap}
-.chart-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;margin-bottom:1rem}
-.chart-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:.875rem}
-.chart-wrap{position:relative;height:220px}
-.idle-badge{display:inline-flex;align-items:center;gap:6px;background:var(--color-background-warning);border:0.5px solid var(--color-border-warning);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--color-text-warning);margin-bottom:1rem}
-.idle-dot{width:6px;height:6px;border-radius:50%;background:#BA7517;animation:pulse 1.5s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-.log-list{display:flex;flex-direction:column;gap:6px;margin-top:.5rem}
-.log-item{display:flex;align-items:center;gap:10px;padding:.6rem .875rem;background:var(--color-background-secondary);border-radius:var(--border-radius-md)}
-.log-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.log-name{font-size:13px;color:var(--color-text-primary);flex:1}
-.log-dur{font-size:12px;color:var(--color-text-secondary)}
-.log-time{font-size:11px;color:var(--color-text-secondary)}
-.insight-card{border-radius:var(--border-radius-lg);padding:.875rem 1rem;margin-bottom:.625rem;border:0.5px solid var(--color-border-tertiary)}
-.ins-header{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.ins-icon{font-size:14px}
-.ins-title{font-size:13px;font-weight:500;color:var(--color-text-primary)}
-.ins-body{font-size:12px;color:var(--color-text-secondary);line-height:1.5}
-.prod-bar{height:8px;border-radius:4px;background:var(--color-background-secondary);overflow:hidden;margin:.5rem 0}
-.prod-fill{height:100%;border-radius:4px;background:#3266ad;transition:width .8s ease}
-.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:.75rem}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--color-text-secondary)}
-.legend-sq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-.section-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:.875rem}
+  :root {
+    --gold: #D4A017;
+    --gold-bright: #FFD166;
+    --gold-dim: #8A6A0A;
+    --bg: #080808;
+    --bg2: #111111;
+    --bg3: #1A1A1A;
+    --bg4: #242424;
+    --text: #F0EAD6;
+    --text-muted: #888880;
+    --text-dim: #555550;
+    --border: rgba(212,160,23,0.18);
+    --border-active: rgba(212,160,23,0.6);
+    --glow: 0 0 24px rgba(212,160,23,0.35), 0 0 48px rgba(212,160,23,0.12);
+    --glow-sm: 0 0 12px rgba(212,160,23,0.3);
+    --radius: 14px;
+    --radius-lg: 20px;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── scrollbar ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
+  /* ── noise overlay ── */
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ── header ── */
+  header {
+    position: fixed; top:0; left:0; right:0;
+    z-index: 100;
+    background: rgba(8,8,8,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 2rem;
+    height: 60px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-shadow: var(--glow-sm);
+  }
+  .logo span { color: var(--text); opacity: 0.5; }
+
+  .header-time {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── nav dots ── */
+  .nav-dots {
+    position: fixed; right: 20px; top: 50%;
+    transform: translateY(-50%);
+    z-index: 99;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .nav-dot.active {
+    background: var(--gold);
+    box-shadow: var(--glow-sm);
+    transform: scale(1.4);
+  }
+
+  /* ── sections ── */
+  section {
+    min-height: 100vh;
+    padding: 80px 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding-top: 3rem;
+  }
+
+  /* ── section labels ── */
+  .section-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1.5rem;
+  }
+  .section-tag::before {
+    content:'';
+    display: block;
+    width: 20px; height: 1px;
+    background: var(--gold-dim);
+  }
+
+  h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text);
+    letter-spacing: -0.01em;
+  }
+  h1 .accent { color: var(--gold); text-shadow: var(--glow-sm); }
+
+  h2 {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text);
+  }
+
+  /* ── Section 1: Welcome ── */
+  #s-welcome {
+    display: flex; flex-direction: column; justify-content: center;
+  }
+
+  .tagline {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-top: 1.25rem;
+    line-height: 1.6;
+    max-width: 440px;
+    font-weight: 300;
+  }
+
+  .suggestion-card {
+    margin-top: 2.5rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-left: 2px solid var(--gold);
+    border-radius: var(--radius);
+    display: flex; align-items: center; gap: 14px;
+    max-width: 420px;
+  }
+
+  .suggestion-icon {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: rgba(212,160,23,0.1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .suggestion-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .suggestion-text strong {
+    display: block;
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 2px;
+  }
+
+  .scroll-hint {
+    margin-top: 4rem;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    animation: pulse-hint 2.5s ease-in-out infinite;
+  }
+  .scroll-hint::after {
+    content: '↓';
+    font-size: 16px;
+    color: var(--gold-dim);
+  }
+  @keyframes pulse-hint {
+    0%,100% { opacity: 0.5; } 50% { opacity: 1; }
+  }
+
+  /* ── Section 2: Quick Track ── */
+  #s-track { background: var(--bg); }
+
+  .activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 2rem;
+  }
+
+  .activity-card {
+    aspect-ratio: 1;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .activity-card::before {
+    content:'';
+    position: absolute; inset:0;
+    background: radial-gradient(circle at center, rgba(212,160,23,0.08), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .activity-card:hover {
+    transform: translateY(-3px) scale(1.02);
+    border-color: var(--border-active);
+    box-shadow: var(--glow);
+  }
+  .activity-card:hover::before { opacity: 1; }
+
+  .activity-card:active { transform: scale(0.97); }
+
+  .activity-card.active-card {
+    border-color: var(--gold);
+    box-shadow: var(--glow), inset 0 0 30px rgba(212,160,23,0.07);
+    background: linear-gradient(135deg, var(--bg4), rgba(212,160,23,0.05));
+    animation: card-pulse 2s ease-in-out infinite;
+  }
+  .activity-card.active-card::before { opacity: 1; }
+
+  @keyframes card-pulse {
+    0%,100% { box-shadow: var(--glow), inset 0 0 30px rgba(212,160,23,0.07); }
+    50% { box-shadow: 0 0 32px rgba(212,160,23,0.5), 0 0 64px rgba(212,160,23,0.18), inset 0 0 30px rgba(212,160,23,0.1); }
+  }
+
+  .card-icon {
+    font-size: 28px;
+    line-height: 1;
+    transition: transform 0.3s;
+  }
+  .activity-card:hover .card-icon { transform: scale(1.15); }
+
+  .card-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+  .activity-card:hover .card-label,
+  .activity-card.active-card .card-label { color: var(--gold); }
+
+  .card-status {
+    position: absolute; top: 10px; right: 10px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 8px var(--gold);
+    animation: blink 1s ease-in-out infinite;
+    display: none;
+  }
+  .activity-card.active-card .card-status { display: block; }
+
+  @keyframes blink {
+    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
+  }
+
+  /* ── Section 3: Timer ── */
+  #s-timer {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%);
+    display: flex; align-items: center;
+  }
+
+  .timer-shell {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    animation: fadeSlideUp 0.5s cubic-bezier(0.34,1.2,0.64,1) both;
+  }
+  .timer-shell.visible { display: flex; }
+
+  @keyframes fadeSlideUp {
+    from { opacity:0; transform: translateY(30px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .timer-activity-label {
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 1rem;
+  }
+
+  .timer-activity-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3rem;
+    letter-spacing: 0.05em;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .timer-activity-name .aicon { font-size: 28px; }
+
+  /* ring */
+  .timer-ring-wrap {
+    position: relative;
+    width: 220px; height: 220px;
+    margin-bottom: 2.5rem;
+  }
+
+  .timer-ring-svg {
+    position: absolute; inset:0;
+    transform: rotate(-90deg);
+  }
+
+  .ring-bg { fill: none; stroke: var(--bg4); stroke-width: 6; }
+  .ring-fg {
+    fill: none;
+    stroke: url(#goldGrad);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 628;
+    stroke-dashoffset: 628;
+    transition: stroke-dashoffset 1s linear;
+    filter: drop-shadow(0 0 8px rgba(212,160,23,0.6));
+  }
+
+  .timer-display {
+    position: absolute; inset:0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 4px;
+  }
+
+  .timer-digits {
+    font-family: 'Orbitron', monospace;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    text-shadow: var(--glow-sm);
+    line-height: 1;
+  }
+
+  .timer-seconds-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* stop button */
+  .stop-btn {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    padding: 1rem 3.5rem;
+    background: transparent;
+    border: 1px solid var(--gold);
+    border-radius: 50px;
+    color: var(--gold);
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: var(--glow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+  .stop-btn::before {
+    content:'';
+    position: absolute; inset:0;
+    background: rgba(212,160,23,0.08);
+    transform: scaleX(0);
+    transition: transform 0.3s;
+    transform-origin: left;
+  }
+  .stop-btn:hover { box-shadow: var(--glow); transform: scale(1.03); }
+  .stop-btn:hover::before { transform: scaleX(1); }
+  .stop-btn:active { transform: scale(0.97); }
+
+  .stop-dot {
+    width: 10px; height: 10px;
+    background: var(--gold);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--gold);
+  }
+
+  .timer-idle {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    gap: 1rem;
+    color: var(--text-dim);
+  }
+  .timer-idle-icon {
+    font-size: 48px; opacity: 0.3;
+  }
+  .timer-idle p { font-size: 14px; max-width: 280px; line-height: 1.6; }
+
+  /* ── Section 4: Log ── */
+  #s-log { background: var(--bg); }
+
+  .log-empty {
+    text-align: center;
+    padding: 3rem 0;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+  .log-empty-icon { font-size: 36px; opacity: 0.3; margin-bottom: 1rem; }
+
+  .log-list {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-top: 1.5rem;
+  }
+
+  .log-entry {
+    display: flex; align-items: center; gap: 14px;
+    padding: 1rem 1.25rem;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    animation: fadeSlideUp 0.4s cubic-bezier(0.34,1.2,0.64,1) both;
+  }
+
+  .log-icon-wrap {
+    width: 40px; height: 40px; flex-shrink: 0;
+    background: rgba(212,160,23,0.08);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .log-info { flex: 1; }
+  .log-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .log-time { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  .log-duration {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    text-align: right;
+    min-width: 60px;
+  }
+
+  .log-total {
+    margin-top: 1.5rem;
+    padding: 1rem 1.25rem;
+    background: rgba(212,160,23,0.05);
+    border: 0.5px solid var(--border-active);
+    border-radius: var(--radius);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .log-total-label { font-size: 13px; color: var(--text-muted); }
+  .log-total-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold);
+    text-shadow: var(--glow-sm);
+  }
+
+  /* ── Section 5: Insights ── */
+  #s-insights { background: var(--bg2); }
+
+  .insights-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 2rem;
+  }
+
+  .insight-card {
+    padding: 1.25rem;
+    background: var(--bg3);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+  .insight-card.wide { grid-column: span 2; }
+
+  .insight-label {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+
+  .insight-value {
+    font-family: 'Orbitron', monospace;
+    font-size: 26px;
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .insight-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* bar chart */
+  .bar-chart {
+    display: flex; align-items: flex-end; gap: 8px;
+    height: 80px;
+    margin-top: 1rem;
+  }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar {
+    width: 100%;
+    background: var(--bg4);
+    border-radius: 4px 4px 0 0;
+    border: 0.5px solid var(--border);
+    transition: height 1s cubic-bezier(0.34,1.2,0.64,1);
+    min-height: 4px;
+  }
+  .bar.gold { background: linear-gradient(180deg, var(--gold-bright), var(--gold-dim)); border-color: var(--gold); box-shadow: 0 -4px 12px rgba(212,160,23,0.3); }
+  .bar-day { font-size: 10px; color: var(--text-dim); }
+
+  /* streak dots */
+  .streak-row { display: flex; gap: 6px; margin-top: 0.75rem; flex-wrap: wrap; }
+  .streak-dot {
+    width: 28px; height: 28px;
+    border-radius: 6px;
+    border: 0.5px solid var(--border);
+    background: var(--bg4);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+  .streak-dot.done {
+    background: rgba(212,160,23,0.15);
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
+
+  /* toast */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--bg3);
+    border: 0.5px solid var(--gold);
+    border-radius: 50px;
+    padding: 0.75rem 1.5rem;
+    font-size: 13px;
+    color: var(--text);
+    box-shadow: var(--glow);
+    z-index: 200;
+    transition: transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* floating active indicator */
+  .floating-pill {
+    position: fixed; bottom: 5rem; right: 1.5rem;
+    z-index: 150;
+    background: var(--bg3);
+    border: 1px solid var(--gold);
+    border-radius: 50px;
+    padding: 0.6rem 1.1rem;
+    display: none;
+    align-items: center; gap: 8px;
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--glow);
+    animation: floatIn 0.4s cubic-bezier(0.34,1.2,0.64,1) both;
+  }
+  .floating-pill.visible { display: flex; }
+
+  @keyframes floatIn {
+    from { opacity:0; transform: translateY(20px) scale(0.9); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+  }
+
+  .floating-pill .fp-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    box-shadow: 0 0 6px var(--gold);
+    animation: blink 1s ease-in-out infinite;
+  }
+  .floating-pill .fp-time {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+  }
+
+  /* section divider */
+  .s-divider {
+    width: 40px; height: 1px;
+    background: var(--gold-dim);
+    margin: 1.5rem 0;
+    opacity: 0.4;
+  }
+
+  @media (max-width: 480px) {
+    .activity-grid { grid-template-columns: repeat(2,1fr); }
+    .insights-grid { grid-template-columns: 1fr; }
+    .insight-card.wide { grid-column: span 1; }
+    section { padding: 80px 1.25rem 4rem; }
+  }
 </style>
+</head>
+<body>
 
-<div class="ts-app">
-  <div class="ts-header">
-    <div class="ts-logo"><span>Time</span>Scope</div>
-    <div class="ts-nav">
-      <button class="active" onclick="showTab('track')">Track</button>
-      <button onclick="showTab('analytics')">Analytics</button>
-      <button onclick="showTab('insights')">Insights</button>
-    </div>
-  </div>
+<!-- Header -->
+<header>
+  <div class="logo">TIME<span>SCOPE</span></div>
+  <div class="header-time" id="headerTime">00:00:00</div>
+</header>
 
-  <!-- TRACK TAB -->
-  <div class="ts-section active" id="tab-track">
-    <div id="idle-banner" class="idle-badge" style="display:none"><span class="idle-dot"></span> Idle detected — time classified as break</div>
-    <div id="suggestion-area"></div>
-    <div class="section-title">Tap to start tracking</div>
-    <div class="activity-grid" id="actGrid"></div>
-    <div class="section-title" style="margin-top:1.25rem">Today's log</div>
-    <div class="log-list" id="logList"><div style="font-size:12px;color:var(--color-text-secondary)">No sessions yet today.</div></div>
-  </div>
+<!-- Nav dots -->
+<nav class="nav-dots" aria-label="Section navigation">
+  <div class="nav-dot active" onclick="scrollToSection('s-welcome')" title="Welcome"></div>
+  <div class="nav-dot" onclick="scrollToSection('s-track')" title="Quick Track"></div>
+  <div class="nav-dot" onclick="scrollToSection('s-timer')" title="Timer"></div>
+  <div class="nav-dot" onclick="scrollToSection('s-log')" title="Today's Log"></div>
+  <div class="nav-dot" onclick="scrollToSection('s-insights')" title="Insights"></div>
+</nav>
 
-  <!-- ANALYTICS TAB -->
-  <div class="ts-section" id="tab-analytics">
-    <div class="metric-grid" id="metricGrid"></div>
-    <div class="chart-card">
-      <div class="chart-title">Time by activity</div>
-      <div class="legend-row" id="barLegend"></div>
-      <div class="chart-wrap"><canvas id="barChart" role="img" aria-label="Bar chart showing time spent on each activity today">Activity time chart</canvas></div>
-    </div>
-    <div class="chart-card">
-      <div class="chart-title">Productive vs non-productive</div>
-      <div class="legend-row" id="pieLegend"></div>
-      <div class="chart-wrap" style="height:180px"><canvas id="pieChart" role="img" aria-label="Pie chart of productive versus non-productive time">Productivity breakdown</canvas></div>
-    </div>
-  </div>
-
-  <!-- INSIGHTS TAB -->
-  <div class="ts-section" id="tab-insights">
-    <div class="section-title">Weekly insights</div>
-    <div id="insightCards"></div>
-  </div>
+<!-- Floating pill (active session) -->
+<div class="floating-pill" id="floatingPill" onclick="scrollToSection('s-timer')">
+  <div class="fp-dot"></div>
+  <span id="fpLabel">Study</span>
+  <span class="fp-time" id="fpTime">00:00</span>
 </div>
 
-<div class="running-bar" id="runningBar">
-  <span id="runningLabel">Tracking...</span>
-  <span id="runningClock">00:00</span>
-  <button class="stop-btn" onclick="stopCurrent()">Stop</button>
-</div>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<!-- ── SECTION 1: Welcome ── -->
+<section id="s-welcome">
+  <div class="section-inner">
+    <div class="section-tag">Dashboard</div>
+    <h1>Track Your<br><span class="accent">Time,</span> Own<br>Your Day.</h1>
+    <p class="tagline">Every minute has a story. TimeScope helps you discover yours — effortlessly.</p>
+
+    <div class="suggestion-card" id="suggestionCard">
+      <div class="suggestion-icon">⚡</div>
+      <div class="suggestion-text">
+        <strong id="suggestionText">Loading smart suggestion...</strong>
+        <span id="suggestionSub">Based on your recent activity patterns</span>
+      </div>
+    </div>
+
+    <div class="scroll-hint" onclick="scrollToSection('s-track')">Scroll to track</div>
+  </div>
+</section>
+
+<!-- ── SECTION 2: Quick Track ── -->
+<section id="s-track">
+  <div class="section-inner">
+    <div class="section-tag">Quick Track</div>
+    <h2>What are you<br>doing right now?</h2>
+    <div class="s-divider"></div>
+
+    <div class="activity-grid" id="activityGrid">
+      <div class="activity-card" data-activity="Study" data-icon="📚" onclick="startActivity(this)">
+        <div class="card-status"></div>
+        <div class="card-icon">📚</div>
+        <div class="card-label">Study</div>
+      </div>
+      <div class="activity-card" data-activity="Work" data-icon="💼" onclick="startActivity(this)">
+        <div class="card-status"></div>
+        <div class="card-icon">💼</div>
+        <div class="card-label">Work</div>
+      </div>
+      <div class="activity-card" data-activity="Exercise" data-icon="🏃" onclick="startActivity(this)">
+        <div class="card-status"></div>
+        <div class="card-icon">🏃</div>
+        <div class="card-label">Exercise</div>
+      </div>
+      <div class="activity-card" data-activity="Phone" data-icon="📱" onclick="startActivity(this)">
+        <div class="card-status"></div>
+        <div class="card-icon">📱</div>
+        <div class="card-label">Phone</div>
+      </div>
+      <div class="activity-card" data-activity="Sleep" data-icon="😴" onclick="startActivity(this)">
+        <div class="card-status"></div>
+        <div class="card-icon">😴</div>
+        <div class="card-label">Sleep</div>
+      </div>
+      <div class="activity-card" data-activity="Travel" data-icon="✈️" onclick="startActivity(this)">
+        <div class="card-status"></div>
+        <div class="card-icon">✈️</div>
+        <div class="card-label">Travel</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 3: Timer ── -->
+<section id="s-timer">
+  <div class="section-inner" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:100%;">
+    <div class="section-tag">Active Timer</div>
+
+    <!-- Idle state -->
+    <div class="timer-idle" id="timerIdle">
+      <div class="timer-idle-icon">⏱</div>
+      <p>Select an activity above to start tracking your time</p>
+    </div>
+
+    <!-- Active timer -->
+    <div class="timer-shell" id="timerShell">
+      <div class="timer-activity-label">Currently Tracking</div>
+      <div class="timer-activity-name">
+        <span class="aicon" id="timerIcon">📚</span>
+        <span id="timerLabel">Study</span>
+      </div>
+
+      <div class="timer-ring-wrap">
+        <svg class="timer-ring-svg" viewBox="0 0 220 220">
+          <defs>
+            <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#8A6A0A"/>
+              <stop offset="100%" stop-color="#FFD166"/>
+            </linearGradient>
+          </defs>
+          <circle class="ring-bg" cx="110" cy="110" r="100"/>
+          <circle class="ring-fg" id="timerRing" cx="110" cy="110" r="100"/>
+        </svg>
+        <div class="timer-display">
+          <div class="timer-digits" id="timerDigits">00:00</div>
+          <div class="timer-seconds-label" id="timerSecondsLabel">HH:MM</div>
+        </div>
+      </div>
+
+      <button class="stop-btn" onclick="stopActivity()">
+        <div class="stop-dot"></div>
+        STOP &amp; SAVE
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 4: Log ── -->
+<section id="s-log">
+  <div class="section-inner">
+    <div class="section-tag">Today's Log</div>
+    <h2>Time Entries</h2>
+    <div class="s-divider"></div>
+
+    <div id="logEmpty" class="log-empty">
+      <div class="log-empty-icon">🗒</div>
+      <p>No entries yet. Start tracking to see your log here.</p>
+    </div>
+
+    <div class="log-list" id="logList" style="display:none;"></div>
+    <div class="log-total" id="logTotal" style="display:none;">
+      <span class="log-total-label">Total tracked today</span>
+      <span class="log-total-value" id="logTotalValue">00:00:00</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECTION 5: Insights ── -->
+<section id="s-insights">
+  <div class="section-inner">
+    <div class="section-tag">Insights</div>
+    <h2>Your Patterns</h2>
+    <div class="s-divider"></div>
+
+    <div class="insights-grid">
+      <div class="insight-card">
+        <div class="insight-label">Sessions Today</div>
+        <div class="insight-value" id="iSessions">0</div>
+        <div class="insight-sub">activities logged</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-label">Top Activity</div>
+        <div class="insight-value" id="iTopActivity" style="font-size:20px;">—</div>
+        <div class="insight-sub" id="iTopSub">no data yet</div>
+      </div>
+      <div class="insight-card wide">
+        <div class="insight-label">Weekly Overview (sample)</div>
+        <div class="bar-chart" id="barChart"></div>
+      </div>
+      <div class="insight-card wide">
+        <div class="insight-label">7-Day Streak</div>
+        <div class="streak-row" id="streakRow"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <script>
-const ACTIVITIES = [
-  {id:'study',name:'Study',icon:'📚',cat:'Productive',color:'#3266ad'},
-  {id:'work',name:'Work',icon:'💼',cat:'Productive',color:'#0F6E56'},
-  {id:'exercise',name:'Exercise',icon:'🏃',cat:'Productive',color:'#639922'},
-  {id:'phone',name:'Phone',icon:'📱',cat:'Non-productive',color:'#D4537E'},
-  {id:'sleep',name:'Sleep',icon:'😴',cat:'Non-productive',color:'#7F77DD'},
-  {id:'travel',name:'Travel',icon:'🚗',cat:'Non-productive',color:'#BA7517'},
-];
+  const SECTIONS = ['s-welcome','s-track','s-timer','s-log','s-insights'];
+  const DAYS = ['M','T','W','T','F','S','S'];
 
-const COLORS = {'study':'#3266ad','work':'#0F6E56','exercise':'#639922','phone':'#D4537E','sleep':'#7F77DD','travel':'#BA7517','idle':'#888780'};
+  let activeActivity = null;
+  let timerStart = null;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let logEntries = [];
+  let totalSeconds = 0;
 
-let state = {
-  running: null,
-  startTime: null,
-  sessions: JSON.parse(localStorage.getItem('ts_sessions') || '[]').filter(s => isToday(s.start)),
-  patterns: JSON.parse(localStorage.getItem('ts_patterns') || '{}'),
-  idleTimer: null,
-  idleActive: false,
-  idleStart: null,
-  clockInterval: null,
-  barChart: null,
-  pieChart: null,
-};
+  /* ── header clock ── */
+  function updateHeaderTime() {
+    const now = new Date();
+    document.getElementById('headerTime').textContent =
+      now.toLocaleTimeString('en-US', {hour12:false});
+  }
+  setInterval(updateHeaderTime, 1000);
+  updateHeaderTime();
 
-function isToday(ts) {
-  const d = new Date(ts), n = new Date();
-  return d.getDate()===n.getDate()&&d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear();
-}
+  /* ── smart suggestion ── */
+  function loadSuggestion() {
+    const hour = new Date().getHours();
+    const suggestions = [
+      { h: [6,7,8],    text: 'Good morning! Your best focus hours are now.', sub: 'You usually study between 6–9 AM', icon: '🌅' },
+      { h: [9,10,11],  text: 'Peak productivity window — time to work.', sub: 'Work sessions peak mid-morning', icon: '🚀' },
+      { h: [12,13],    text: 'Midday check-in. How has the day gone?', sub: 'You log breaks around noon', icon: '☀️' },
+      { h: [14,15,16], text: 'Post-lunch focus block detected.', sub: 'Deep work tends to happen now', icon: '🎯' },
+      { h: [17,18],    text: 'Wind-down time. Log your final tasks.', sub: 'Evening routine usually starts here', icon: '🌆' },
+      { h: [19,20,21], text: 'You usually study at this hour.', sub: 'Evening study sessions are your habit', icon: '📚' },
+      { h: [22,23,0],  text: 'Late session? Don\'t forget to track sleep.', sub: 'Sleep quality starts with logging', icon: '🌙' },
+    ];
+    const match = suggestions.find(s => s.h.includes(hour)) || suggestions[1];
+    document.getElementById('suggestionText').textContent = match.text;
+    document.getElementById('suggestionSub').textContent = match.sub;
+    document.querySelector('.suggestion-icon').textContent = match.icon;
+  }
+  loadSuggestion();
 
-function fmtDur(ms) {
-  const s = Math.round(ms/1000), m = Math.floor(s/60), h = Math.floor(m/60);
-  if(h>0) return h+'h '+(m%60)+'m';
-  if(m>0) return m+'m '+(s%60)+'s';
-  return s+'s';
-}
-
-function fmtTime(ts) {
-  return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-}
-
-function save() {
-  localStorage.setItem('ts_sessions', JSON.stringify(state.sessions));
-  localStorage.setItem('ts_patterns', JSON.stringify(state.patterns));
-}
-
-function getTotals() {
-  const t = {};
-  state.sessions.forEach(s => { t[s.id] = (t[s.id]||0) + s.duration; });
-  return t;
-}
-
-function getProdPct() {
-  let prod=0, total=0;
-  state.sessions.forEach(s => {
-    const a = ACTIVITIES.find(x=>x.id===s.id);
-    total += s.duration;
-    if(a && a.cat==='Productive') prod += s.duration;
-  });
-  return total===0 ? 0 : Math.round(prod/total*100);
-}
-
-function renderActivityGrid() {
-  const totals = getTotals();
-  document.getElementById('actGrid').innerHTML = ACTIVITIES.map(a => {
-    const running = state.running === a.id;
-    const tot = totals[a.id] ? fmtDur(totals[a.id]) : '0m';
-    return `<button class="act-btn ${a.id} ${running?'running':''}" onclick="toggleActivity('${a.id}')">
-      <div class="act-icon">${a.icon}</div>
-      <div class="act-name">${a.name}</div>
-      <div class="act-cat">${a.cat}</div>
-      ${running ? `<div class="act-timer" id="btn-timer-${a.id}">timing...</div>` : ''}
-      <div class="act-total">Today: ${tot}</div>
-    </button>`;
-  }).join('');
-}
-
-function renderLog() {
-  const el = document.getElementById('logList');
-  const today = [...state.sessions].reverse().slice(0,10);
-  if(!today.length) { el.innerHTML = '<div style="font-size:12px;color:var(--color-text-secondary)">No sessions yet today.</div>'; return; }
-  el.innerHTML = today.map(s => {
-    const a = ACTIVITIES.find(x=>x.id===s.id) || {name:s.id,color:'#888'};
-    return `<div class="log-item">
-      <div class="log-dot" style="background:${COLORS[s.id]||'#888'}"></div>
-      <span class="log-name">${a.icon||''} ${a.name||s.id}</span>
-      <span class="log-dur">${fmtDur(s.duration)}</span>
-      <span class="log-time">${fmtTime(s.start)}</span>
-    </div>`;
-  }).join('');
-}
-
-function renderSuggestions() {
-  const hour = new Date().getHours();
-  const suggestions = [];
-  ACTIVITIES.forEach(a => {
-    const p = state.patterns[a.id];
-    if(p && p.hours) {
-      const freq = p.hours[hour] || 0;
-      if(freq >= 2 && state.running !== a.id) {
-        suggestions.push({a, msg: `You usually ${a.name.toLowerCase()} around ${hour}:00. Start tracking?`});
+  /* ── nav dot observer ── */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = SECTIONS.indexOf(e.target.id);
+        document.querySelectorAll('.nav-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
       }
-    }
-  });
-  if(hour >= 22 || hour < 6) suggestions.push({a:ACTIVITIES.find(x=>x.id==='sleep'), msg:'It\'s late — are you sleeping? Start sleep tracker?'});
-  if(hour >= 9 && hour < 12 && !suggestions.length) suggestions.push({a:ACTIVITIES.find(x=>x.id==='work'), msg:'Morning productivity window! Start work session?'});
-  const area = document.getElementById('suggestion-area');
-  area.innerHTML = suggestions.slice(0,2).map(s => `
-    <div class="suggestion-card">
-      <span class="sug-icon">${s.a.icon}</span>
-      <span class="sug-text">${s.msg}</span>
-      <button class="sug-btn" onclick="toggleActivity('${s.a.id}')">Start ↗</button>
-    </div>`).join('');
-}
-
-function toggleActivity(id) {
-  if(state.running === id) { stopCurrent(); return; }
-  if(state.running) stopCurrent();
-  state.running = id;
-  state.startTime = Date.now();
-  const bar = document.getElementById('runningBar');
-  bar.classList.add('visible');
-  const a = ACTIVITIES.find(x=>x.id===id);
-  document.getElementById('runningLabel').textContent = (a?a.icon+' ':'')+( a?a.name:id);
-  resetIdleTimer();
-  state.clockInterval = setInterval(() => {
-    const el = document.getElementById('runningClock');
-    if(el) { const d = Date.now()-state.startTime; const m=Math.floor(d/60000); const s=Math.floor((d%60000)/1000); el.textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); }
-    const bt = document.getElementById('btn-timer-'+id);
-    if(bt) { const d=Date.now()-state.startTime; bt.textContent=fmtDur(d); }
-  }, 1000);
-  renderActivityGrid();
-}
-
-function stopCurrent() {
-  if(!state.running) return;
-  const dur = Date.now() - state.startTime;
-  if(dur > 3000) {
-    const session = {id:state.running, start:state.startTime, duration:dur};
-    state.sessions.push(session);
-    updatePattern(state.running, new Date(state.startTime).getHours());
-    save();
-  }
-  clearInterval(state.clockInterval);
-  clearTimeout(state.idleTimer);
-  state.running = null; state.startTime = null; state.idleActive = false;
-  document.getElementById('runningBar').classList.remove('visible');
-  document.getElementById('idle-banner').style.display = 'none';
-  renderActivityGrid();
-  renderLog();
-  renderSuggestions();
-  refreshAnalytics();
-}
-
-function updatePattern(id, hour) {
-  if(!state.patterns[id]) state.patterns[id] = {hours:{}};
-  state.patterns[id].hours[hour] = (state.patterns[id].hours[hour]||0)+1;
-}
-
-function resetIdleTimer() {
-  clearTimeout(state.idleTimer);
-  if(state.idleActive) { state.idleActive=false; document.getElementById('idle-banner').style.display='none'; }
-  state.idleTimer = setTimeout(() => {
-    state.idleActive = true;
-    state.idleStart = Date.now();
-    document.getElementById('idle-banner').style.display = 'flex';
-  }, 60000);
-}
-
-document.addEventListener('mousemove', () => { if(state.running) resetIdleTimer(); });
-document.addEventListener('keydown', () => { if(state.running) resetIdleTimer(); });
-
-function showTab(t) {
-  document.querySelectorAll('.ts-section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.ts-nav button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  event.target.classList.add('active');
-  if(t==='analytics') refreshAnalytics();
-  if(t==='insights') renderInsights();
-}
-
-function refreshAnalytics() {
-  const totals = getTotals();
-  const totalMs = Object.values(totals).reduce((a,b)=>a+b,0);
-  const prodPct = getProdPct();
-  const sessions = state.sessions.length;
-  const longestEntry = Object.entries(totals).sort((a,b)=>b[1]-a[1])[0];
-  const longest = longestEntry ? ACTIVITIES.find(x=>x.id===longestEntry[0])?.name || longestEntry[0] : '—';
-  document.getElementById('metricGrid').innerHTML = `
-    <div class="metric-card"><div class="metric-label">Total tracked</div><div class="metric-value">${totalMs?fmtDur(totalMs):'0m'}</div></div>
-    <div class="metric-card"><div class="metric-label">Productivity</div><div class="metric-value">${prodPct}%</div></div>
-    <div class="metric-card"><div class="metric-label">Sessions</div><div class="metric-value">${sessions}</div></div>
-    <div class="metric-card"><div class="metric-label">Top activity</div><div class="metric-value" style="font-size:15px">${longest}</div></div>`;
-
-  const acts = ACTIVITIES.filter(a=>totals[a.id]);
-  const labels = acts.map(a=>a.name);
-  const data = acts.map(a=>+(totals[a.id]/60000).toFixed(1));
-  const colors = acts.map(a=>a.color);
-  document.getElementById('barLegend').innerHTML = acts.map(a=>`<span class="legend-item"><span class="legend-sq" style="background:${a.color}"></span>${a.name}</span>`).join('');
-  if(state.barChart) { state.barChart.destroy(); }
-  const bCtx = document.getElementById('barChart').getContext('2d');
-  state.barChart = new Chart(bCtx, {
-    type:'bar',
-    data:{labels, datasets:[{data, backgroundColor:colors, borderRadius:4, borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>v+'m'},grid:{color:'rgba(128,128,128,.12)'}},x:{grid:{display:false}}}}
-  });
-
-  let prod=0, nonprod=0;
-  state.sessions.forEach(s=>{const a=ACTIVITIES.find(x=>x.id===s.id);if(a?.cat==='Productive')prod+=s.duration;else nonprod+=s.duration;});
-  const pLabels = ['Productive','Non-productive'];
-  const pData = [+(prod/60000).toFixed(1), +(nonprod/60000).toFixed(1)];
-  const pColors = ['#3266ad','#D4537E'];
-  document.getElementById('pieLegend').innerHTML = pLabels.map((l,i)=>`<span class="legend-item"><span class="legend-sq" style="background:${pColors[i]}"></span>${l}: ${pData[i]}m</span>`).join('');
-  if(state.pieChart) { state.pieChart.destroy(); }
-  const pCtx = document.getElementById('pieChart').getContext('2d');
-  state.pieChart = new Chart(pCtx, {
-    type:'doughnut',
-    data:{labels:pLabels, datasets:[{data:pData, backgroundColor:pColors, borderWidth:0, hoverOffset:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},cutout:'60%'}
-  });
-}
-
-function renderInsights() {
-  const totals = getTotals();
-  const totalMs = Object.values(totals).reduce((a,b)=>a+b,0);
-  const prodPct = getProdPct();
-  const insights = [];
-  const hour = new Date().getHours();
-  if(totalMs > 0) {
-    ACTIVITIES.forEach(a => {
-      const pct = totals[a.id] ? Math.round(totals[a.id]/totalMs*100) : 0;
-      if(pct >= 20) insights.push({icon:a.icon, title:`${a.name} takes up ${pct}% of your day`, body:`You've spent ${fmtDur(totals[a.id])} on ${a.name.toLowerCase()} today. ${a.cat==='Non-productive'?'Consider reducing this.':'Keep it up!'}`});
     });
+  }, { threshold: 0.5 });
+  SECTIONS.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  function scrollToSection(id) {
+    document.getElementById(id).scrollIntoView({ behavior:'smooth' });
   }
-  if(prodPct >= 60) insights.push({icon:'⭐', title:'Great productivity today!', body:`You're ${prodPct}% productive today — above the recommended 60% threshold. Your focus is strong.`});
-  else if(prodPct < 40 && totalMs > 0) insights.push({icon:'💡', title:'Productivity can improve', body:`Only ${prodPct}% of your tracked time today was productive. Try the Pomodoro technique: 25 min work, 5 min break.`});
-  if(hour >= 9 && hour <= 11) insights.push({icon:'🌅', title:'Peak morning window active', body:'Research shows 9–11 AM is the most cognitively productive window. This is the best time for deep work or study.'});
-  if(hour >= 14 && hour <= 15) insights.push({icon:'😴', title:'Afternoon dip detected', body:'Post-lunch energy typically dips between 2–3 PM. A short walk or 20-min nap can restore focus significantly.'});
-  insights.push({icon:'📊', title:'Track more to unlock deeper insights', body:'Add at least 3 days of data to see weekly patterns, peak productivity hours, and behavioral trends.'});
-  const bgMap = ['#e6f1fb','#e1f5ee','#faeeda','#fbeaf0','#eeedfe','#eaf3de'];
-  const el = document.getElementById('insightCards');
-  el.innerHTML = insights.map((ins,i) => `
-    <div class="insight-card" style="background:${bgMap[i%bgMap.length]}">
-      <div class="ins-header"><span class="ins-icon">${ins.icon}</span><span class="ins-title">${ins.title}</span></div>
-      <div class="ins-body">${ins.body}</div>
-    </div>`).join('');
-  if(!insights.length) el.innerHTML = '<div style="font-size:12px;color:var(--color-text-secondary)">Track some activities to generate insights.</div>';
-}
 
-function addSampleData() {
-  const now = Date.now();
-  const samples = [
-    {id:'work', start: now - 5*3600000, duration: 90*60000},
-    {id:'study', start: now - 3*3600000, duration: 45*60000},
-    {id:'phone', start: now - 1.5*3600000, duration: 30*60000},
-    {id:'exercise', start: now - 0.5*3600000, duration: 20*60000},
-  ];
-  state.sessions = [...state.sessions, ...samples];
-  state.patterns = {work:{hours:{9:3,10:3,14:2}}, study:{hours:{19:4,20:3}}, phone:{hours:{12:2,15:2,22:3}}};
-  save();
-  renderActivityGrid();
-  renderLog();
-  renderSuggestions();
-}
+  /* ── activity start ── */
+  function startActivity(card) {
+    if (activeActivity) stopActivity(true);
 
-renderActivityGrid();
-renderLog();
-renderSuggestions();
+    const name = card.dataset.activity;
+    const icon = card.dataset.icon;
 
-setTimeout(() => {
-  if(state.sessions.length === 0) addSampleData();
-}, 200);
+    // highlight card
+    document.querySelectorAll('.activity-card').forEach(c => c.classList.remove('active-card'));
+    card.classList.add('active-card');
+
+    activeActivity = { name, icon, card, startTime: new Date() };
+    timerSeconds = 0;
+
+    // update timer UI
+    document.getElementById('timerIdle').style.display = 'none';
+    const shell = document.getElementById('timerShell');
+    shell.classList.remove('visible');
+    void shell.offsetWidth; // reflow for re-animation
+    shell.classList.add('visible');
+    document.getElementById('timerIcon').textContent = icon;
+    document.getElementById('timerLabel').textContent = name;
+    document.getElementById('timerDigits').textContent = '00:00';
+    document.getElementById('timerSecondsLabel').textContent = 'HH:MM';
+    document.getElementById('timerRing').style.strokeDashoffset = 628;
+
+    // start interval
+    clearInterval(timerInterval);
+    timerInterval = setInterval(tickTimer, 1000);
+
+    // floating pill
+    document.getElementById('fpLabel').textContent = name;
+    document.getElementById('fpTime').textContent = '00:00';
+    document.getElementById('floatingPill').classList.add('visible');
+
+    // smooth scroll
+    setTimeout(() => scrollToSection('s-timer'), 80);
+    showToast(`${icon} ${name} started!`);
+  }
+
+  function tickTimer() {
+    timerSeconds++;
+    const h = Math.floor(timerSeconds / 3600);
+    const m = Math.floor((timerSeconds % 3600) / 60);
+    const s = timerSeconds % 60;
+
+    const display = h > 0
+      ? `${pad(h)}:${pad(m)}:${pad(s)}`
+      : `${pad(m)}:${pad(s)}`;
+    const label = h > 0 ? 'HH:MM:SS' : 'MM:SS';
+
+    document.getElementById('timerDigits').textContent = display;
+    document.getElementById('timerSecondsLabel').textContent = label;
+
+    // floating pill
+    document.getElementById('fpTime').textContent = h > 0 ? `${pad(h)}:${pad(m)}` : `${pad(m)}:${pad(s)}`;
+
+    // ring: 1 full revolution = 60min = 3600s
+    const offset = 628 - Math.min(628, (timerSeconds / 3600) * 628);
+    document.getElementById('timerRing').style.strokeDashoffset = offset;
+  }
+
+  function pad(n) { return String(n).padStart(2,'0'); }
+
+  /* ── stop ── */
+  function stopActivity(silent) {
+    if (!activeActivity) return;
+    clearInterval(timerInterval);
+
+    const duration = timerSeconds;
+    const entry = {
+      name: activeActivity.name,
+      icon: activeActivity.icon,
+      startTime: activeActivity.startTime,
+      endTime: new Date(),
+      seconds: duration
+    };
+    logEntries.push(entry);
+    totalSeconds += duration;
+
+    // clear card highlight
+    activeActivity.card.classList.remove('active-card');
+    activeActivity = null;
+
+    // hide timer
+    document.getElementById('timerShell').classList.remove('visible');
+    document.getElementById('timerIdle').style.display = '';
+    document.getElementById('floatingPill').classList.remove('visible');
+
+    // update log
+    updateLog();
+    updateInsights();
+    if (!silent) {
+      showToast(`✅ Saved — ${formatDuration(duration)}`);
+      setTimeout(() => scrollToSection('s-log'), 400);
+    }
+  }
+
+  function formatDuration(s) {
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    if (h > 0) return `${pad(h)}h ${pad(m)}m ${pad(sec)}s`;
+    if (m > 0) return `${pad(m)}m ${pad(sec)}s`;
+    return `${pad(sec)}s`;
+  }
+
+  function formatTime(d) {
+    return d.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit', hour12:true});
+  }
+
+  /* ── log update ── */
+  function updateLog() {
+    const empty = document.getElementById('logEmpty');
+    const list  = document.getElementById('logList');
+    const total = document.getElementById('logTotal');
+    const tv    = document.getElementById('logTotalValue');
+
+    if (logEntries.length === 0) {
+      empty.style.display = '';
+      list.style.display = 'none';
+      total.style.display = 'none';
+      return;
+    }
+    empty.style.display = 'none';
+    list.style.display = 'flex';
+    total.style.display = 'flex';
+
+    list.innerHTML = [...logEntries].reverse().map((e, i) => `
+      <div class="log-entry" style="animation-delay:${i*0.06}s">
+        <div class="log-icon-wrap">${e.icon}</div>
+        <div class="log-info">
+          <div class="log-name">${e.name}</div>
+          <div class="log-time">${formatTime(e.startTime)} → ${formatTime(e.endTime)}</div>
+        </div>
+        <div class="log-duration">${formatDuration(e.seconds)}</div>
+      </div>
+    `).join('');
+
+    const h = Math.floor(totalSeconds/3600), m = Math.floor((totalSeconds%3600)/60), s = totalSeconds%60;
+    tv.textContent = `${pad(h)}:${pad(m)}:${pad(s)}`;
+  }
+
+  /* ── insights ── */
+  function updateInsights() {
+    document.getElementById('iSessions').textContent = logEntries.length;
+
+    if (logEntries.length > 0) {
+      const counts = {};
+      logEntries.forEach(e => { counts[e.name] = (counts[e.name]||0) + e.seconds; });
+      const top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
+      document.getElementById('iTopActivity').textContent = (logEntries.find(e=>e.name===top[0]).icon) + ' ' + top[0];
+      document.getElementById('iTopSub').textContent = formatDuration(top[1]) + ' total';
+    }
+  }
+
+  /* ── bar chart (static sample) ── */
+  function buildBarChart() {
+    const data = [45, 90, 30, 120, 75, 60, 0];
+    const max = Math.max(...data, 1);
+    const today = new Date().getDay();
+    const dayIdx = today === 0 ? 6 : today - 1;
+
+    document.getElementById('barChart').innerHTML = data.map((v, i) => `
+      <div class="bar-col">
+        <div class="bar ${i===dayIdx?'gold':''}" style="height:${Math.max(4, (v/max)*68)}px"></div>
+        <div class="bar-day">${DAYS[i]}</div>
+      </div>
+    `).join('');
+  }
+
+  /* ── streak dots ── */
+  function buildStreak() {
+    const today = new Date().getDay();
+    const todayIdx = today === 0 ? 6 : today - 1;
+    document.getElementById('streakRow').innerHTML = DAYS.map((d, i) => `
+      <div class="streak-dot ${i <= todayIdx ? 'done' : ''}">${d}</div>
+    `).join('');
+  }
+
+  /* ── toast ── */
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  buildBarChart();
+  buildStreak();
 </script>
+</body>
+</html>
